@@ -1,0 +1,6 @@
+phase: dev
+
+logging.config: classpath:logback-dev.groovy
+
+server:
+  port: 8080

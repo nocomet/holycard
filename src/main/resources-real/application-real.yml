@@ -1,0 +1,6 @@
+phase: real
+
+logging.config: classpath:logback-real.groovy
+
+server:
+  port: 8080
