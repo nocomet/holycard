@@ -35,7 +35,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.h2database:h2'
+//    runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -45,6 +45,9 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
     compile group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-parent', version: '2.4.2', ext: 'pom'
+
+    // mysql
+    compile('mysql:mysql-connector-java')
 }
 
 test {
