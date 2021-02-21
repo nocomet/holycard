@@ -50,6 +50,12 @@ dependencies {
     compile('mysql:mysql-connector-java')
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+
+    // file io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.4'
+
+    // aws s3
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.959'
 }
 
 test {

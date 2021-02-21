@@ -1,13 +1,11 @@
 package com.nocomet.holycard.domain.entity;
 
-import lombok.Data;
+import com.nocomet.holycard.util.BooleanToYnConverter;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -16,18 +14,22 @@ import javax.persistence.Id;
 public class HolyCard extends VersionBaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cardSeq;
 
-    private String cardImageUrl;
+    private String imageName; // s3 bucket name
 
     private String content;
 
     private Long numberOfHeart = 0L;
 
-    public HolyCard(String cardImageUrl, String content) {
-        this.cardImageUrl = cardImageUrl;
+    @Convert(converter = BooleanToYnConverter.class)
+    private Boolean visible; // 이미지 노출 여부
+
+    public HolyCard(String imageName, String content) {
+        this.imageName = imageName;
         this.content = content;
+        this.visible = false;
     }
 
     public void plusNumberOfHeart() {
