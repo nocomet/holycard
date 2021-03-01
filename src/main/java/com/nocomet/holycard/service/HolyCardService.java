@@ -1,6 +1,9 @@
 package com.nocomet.holycard.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.S3Object;
+import com.nocomet.holycard.conf.CommonCodeConf;
+import com.nocomet.holycard.domain.entity.CommonCode;
 import com.nocomet.holycard.domain.entity.HolyCard;
 import com.nocomet.holycard.domain.repository.HolyCardRepository;
 import com.nocomet.holycard.exception.ApiBaseException;
@@ -13,9 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
+import java.awt.image.BufferedImage;
+import java.io.*;
 
 
 @Service
@@ -70,5 +74,28 @@ public class HolyCardService {
         }
 
         return null;
+    }
+
+    public BufferedImage getImage(String imageName) {
+        String bucketName = commonCodeService.getS3BucketName();
+        S3Object object = s3Client.getObject(bucketName, imageName);
+
+        try {
+            ImageInputStream iis = ImageIO.createImageInputStream(object.getObjectContent());
+            return ImageIO.read(iis);
+        } catch (IOException e) {
+            log.error("getImage IOException e:{}", ExceptionUtils.getStackTrace(e));
+        }
+
+        return null;
+    }
+
+    public String getImageUrlBase() {
+        CommonCode commonCode = commonCodeService.find(CommonCodeConf.IMAGE_URL_BASE.name());
+        if (commonCode == null) {
+            return "http://127.0.0.1:8080/apis/v1/holy-card/{cardSeq}/image.jpg";
+        }
+
+        return commonCode.getValue();
     }
 }
