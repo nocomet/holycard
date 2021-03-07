@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +51,11 @@ public class HolyCardService {
     public HolyCard find(Long cardSeq) throws ApiBaseException {
         return holyCardRepository.findById(cardSeq).orElseThrow(()
             -> new ApiBaseException(ApiError.NOT_FOUND, String.format("HolyCard(cardSeq=%d) is not found.", cardSeq)));
+    }
+
+    public Page<HolyCard> getCardList(Pageable pageable) {
+        Page<HolyCard> all = holyCardRepository.findAll(pageable);
+        return all;
     }
 
     public HolyCard saveCard(String filename, String content, MultipartFile imageFile) {

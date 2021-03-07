@@ -8,6 +8,10 @@ import com.nocomet.holycard.exception.ApiBaseException;
 import com.nocomet.holycard.service.HolyCardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +32,18 @@ public class HolyCardController {
 
         return new ResponseBaseDto<>(ApiResult.OK,
             holyCardDtoResponse(holyCard, imageUrlBase)
+        );
+    }
+
+    @GetMapping("/list")
+    public ResponseBaseDto<HolyCardDto.ListResponse> getListHolyCard(
+        @PageableDefault(sort = {"cardSeq"}, direction = Sort.Direction.ASC, size = 15) Pageable pageable) throws ApiBaseException {
+
+        Page<HolyCard> cardPage = holyCardService.getCardList(pageable);
+        String imageUrlBase = holyCardService.getImageUrlBase();
+
+        return new ResponseBaseDto<>(ApiResult.OK,
+            holyCardListDtoResponse(cardPage, imageUrlBase)
         );
     }
 
@@ -82,6 +98,24 @@ public class HolyCardController {
             .imageUrl(imageUrl)
             .content(holyCard.getContent())
             .heart(holyCard.getNumberOfHeart())
+            .build();
+    }
+
+    private HolyCardDto.ListResponse holyCardListDtoResponse(Page<HolyCard> cardPage, String imageUrlBase) {
+        // Page<holyCard> to Page<HolyCardDto.Response>
+        Page<HolyCardDto.Response> dtoPage = cardPage.map(holyCard -> {
+            String imageUrl = imageUrlBase.replace("{cardSeq}", String.valueOf(holyCard.getCardSeq()));
+
+            return HolyCardDto.Response.builder()
+                .cardSeq(holyCard.getCardSeq())
+                .imageUrl(imageUrl)
+                .content(holyCard.getContent())
+                .heart(holyCard.getNumberOfHeart())
+                .build();
+        });
+
+        return HolyCardDto.ListResponse.builder()
+            .page(dtoPage)
             .build();
     }
 }
