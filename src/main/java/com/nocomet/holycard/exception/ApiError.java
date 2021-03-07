@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public enum ApiError {
 
-    TEST(0, "test", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNKNOWN(0, "UNKNOWN", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_FOUND(10001, "not found.", HttpStatus.NOT_FOUND)
     ;
 
