@@ -1,15 +1,13 @@
 package com.nocomet.holycard.controller;
 
 import com.nocomet.holycard.controller.dto.ApiResult;
+import com.nocomet.holycard.controller.dto.CommonCodeDto;
 import com.nocomet.holycard.controller.dto.ResponseBaseDto;
 import com.nocomet.holycard.domain.entity.CommonCode;
 import com.nocomet.holycard.service.CommonCodeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,7 +22,13 @@ public class CommonCodeController {
 
     @GetMapping("/{key}")
     public ResponseBaseDto<CommonCode> get(@PathVariable String key) {
-        CommonCode commonCode = commonCodeService.find(key);
+        CommonCode commonCode = commonCodeService.findNoCache(key);
+        return new ResponseBaseDto<>(ApiResult.OK, commonCode);
+    }
+
+    @PutMapping("/{key}")
+    public ResponseBaseDto<CommonCode> put(@PathVariable String key, @RequestBody CommonCodeDto.Request request) {
+        CommonCode commonCode = commonCodeService.updateValue(key, request.getValue(), request.getDescription());
         return new ResponseBaseDto<>(ApiResult.OK, commonCode);
     }
 

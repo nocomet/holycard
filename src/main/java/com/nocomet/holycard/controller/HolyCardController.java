@@ -12,10 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.image.BufferedImage;
 
 @RestController
 @Slf4j
@@ -83,8 +83,8 @@ public class HolyCardController {
         }
     }
 
-    @GetMapping(path = "/{cardSeq}/image.jpg", produces = "image/jpeg")
-    public BufferedImage getHolyCardImage(@PathVariable Long cardSeq) throws ApiBaseException {
+    @GetMapping(path = "/{cardSeq}/image.jpg", produces = MediaType.IMAGE_JPEG_VALUE)
+    public @ResponseBody byte[] getHolyCardImage(@PathVariable Long cardSeq) throws ApiBaseException {
         HolyCard holyCard = holyCardService.find(cardSeq);
         String imageName = holyCard.getImageName();
         return holyCardService.getImage(imageName);

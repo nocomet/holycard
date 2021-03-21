@@ -5,6 +5,7 @@ import com.nocomet.holycard.domain.entity.CommonCode;
 import com.nocomet.holycard.domain.repository.CommonCodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,27 +18,35 @@ public class CommonCodeService {
 
     private final CommonCodeRepository commonCodeRepository;
 
-    public void save(String commonKey, String value, String description) {
+    public CommonCode save(String commonKey, String value, String description) {
         if (commonKey == null) {
-            return ;
+            return null;
         }
 
         CommonCode commonCode = new CommonCode(commonKey, value, description);
-        commonCodeRepository.save(commonCode);
+        return commonCodeRepository.save(commonCode);
     }
 
     public List<CommonCode> findAll() {
         return commonCodeRepository.findAll();
     }
 
+    @Cacheable(cacheNames = "cache_common_code_find", key = "#commonKey")
     public CommonCode find(String commonKey) {
         return commonCodeRepository.findById(commonKey).orElse(null);
     }
 
+    public CommonCode findNoCache(String commonKey) {
+        return commonCodeRepository.findById(commonKey).orElse(null);
+    }
+
     @Transactional
-    public CommonCode updateValue(String commonKey, String value) {
-        CommonCode commonCode = find(commonKey);
+    public CommonCode updateValue(String commonKey, String value, String description) {
+        CommonCode commonCode = findNoCache(commonKey);
         commonCode.setValue(value);
+        if (description != null) {
+            commonCode.setDescription(description);
+        }
         return commonCodeRepository.save(commonCode);
     }
 
@@ -58,7 +67,7 @@ public class CommonCodeService {
         return commonCode.getValue();
     }
 
-    private void createIfNull(String commonKey, String value) {
+    public void createIfNull(String commonKey, String value) {
         save(commonKey, value, "createIfNull");
     }
 }

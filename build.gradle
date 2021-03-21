@@ -56,6 +56,11 @@ dependencies {
 
     // aws s3
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.959'
+
+    // cache
+    implementation group: 'net.sf.ehcache', name: 'ehcache', version: '2.10.6'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
 }
 
 test {

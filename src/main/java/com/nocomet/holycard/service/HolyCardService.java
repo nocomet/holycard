@@ -11,7 +11,9 @@ import com.nocomet.holycard.exception.ApiError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,11 +50,13 @@ public class HolyCardService {
         return holyCard;
     }
 
+    @Cacheable(cacheNames = "cache_holy_card_find", key = "#cardSeq")
     public HolyCard find(Long cardSeq) throws ApiBaseException {
         return holyCardRepository.findById(cardSeq).orElseThrow(()
             -> new ApiBaseException(ApiError.NOT_FOUND, String.format("HolyCard(cardSeq=%d) is not found.", cardSeq)));
     }
 
+    @Cacheable(cacheNames = "cache_holy_card_find_list", key = "#pageable")
     public Page<HolyCard> getCardList(Pageable pageable) {
         Page<HolyCard> all = holyCardRepository.findAll(pageable);
         return all;
@@ -83,23 +87,25 @@ public class HolyCardService {
         return null;
     }
 
-    public BufferedImage getImage(String imageName) {
+    @Cacheable(cacheNames = "cache_card_image", key = "#imageName")
+    public byte[] getImage(String imageName) {
+        log.info("getImage not cache. " + imageName);
         String bucketName = commonCodeService.getS3BucketName();
         S3Object object = s3Client.getObject(bucketName, imageName);
 
         try {
-            ImageInputStream iis = ImageIO.createImageInputStream(object.getObjectContent());
-            return ImageIO.read(iis);
+            InputStream in = object.getObjectContent();
+            return IOUtils.toByteArray(in);
         } catch (IOException e) {
             log.error("getImage IOException e:{}", ExceptionUtils.getStackTrace(e));
         }
-
         return null;
     }
 
     public String getImageUrlBase() {
         CommonCode commonCode = commonCodeService.find(CommonCodeConf.IMAGE_URL_BASE.name());
         if (commonCode == null) {
+            commonCodeService.createIfNull(CommonCodeConf.IMAGE_URL_BASE.name(), "http://127.0.0.1:8080/apis/v1/holy-card/{cardSeq}/image.jpg");
             return "http://127.0.0.1:8080/apis/v1/holy-card/{cardSeq}/image.jpg";
         }
 
