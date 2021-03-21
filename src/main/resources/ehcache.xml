@@ -50,7 +50,7 @@
            timeToLiveSeconds="60"
            overflowToDisk="false"
            diskPersistent="false"
-           maxBytesLocalHeap="10M"
+           maxBytesLocalHeap="50M"
            memoryStoreEvictionPolicy="LRU">
     </cache>
 </ehcache>
